@@ -254,6 +254,7 @@
             height: 250px; object-fit: cover; background: #111; 
             border-radius: 0 0 20px 20px;
             display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
         }
         .back-btn-float {
             position: absolute; top: 20px; left: 20px; z-index: 10;
@@ -282,7 +283,7 @@
         .seller-sold-count span { color: var(--primary); font-weight: bold; }
         .pv-gallery-label { font-size: 13px; font-weight: 600; padding: 0 20px 10px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
         .pv-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 160px; padding: 0 20px 20px; gap: 10px; scrollbar-width: none; }
-        .pv-slide { min-width: 200px; height: 100%; object-fit: cover; scroll-snap-align: start; border-radius: 8px; border: 1px solid #333; }
+        .pv-slide { min-width: 200px; height: 100%; object-fit: cover; scroll-snap-align: start; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
         .pv-desc-box { padding: 20px; background: #0a0a0a; margin: 0 20px 20px; border-radius: 10px; border: 1px solid #222; color: #ccc; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
         .video-btn { background: #cc0000; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 20px 20px; width: auto; border:none; }
         .pv-action-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; padding: 15px 20px; border-top: 1px solid #333; display: flex; gap: 10px; z-index: 200; }
@@ -292,7 +293,7 @@
             display: flex; align-items: center; justify-content: space-between;
             width: 100%; padding-right: 15px;
         }
-        .chat-timer { font-family: 'Rajdhani'; font-weight: bold; color: var(--primary); font-size: 18px; }
+        .chat-timer { font-family: 'Rajdhani'; font-weight: bold; color: var(--primary); font-size: 18px; display: none; } /* HIDDEN AS REQUESTED */
         .chat-id { font-size: 12px; color: #888; margin-top: -2px; }
         
         .deal-actions-btn {
@@ -336,9 +337,9 @@
         
         /* Bubble Fixes */
         .msg-bubble { 
-            max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; position: relative; 
-            white-space: pre-wrap; /* Preserves spaces and breaks */
-            word-wrap: break-word; /* Breaks long words */
+            max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; position: relative; 
+            white-space: pre-wrap;
+            word-wrap: break-word;
             word-break: break-word; 
         }
 
@@ -358,8 +359,51 @@
         .msg-row.admin .msg-pic { border: 2px solid gold; }
         .msg-row.admin .msg-name { color: gold; font-weight: bold; }
         
+        /* Audio Player Styling */
+        audio {
+            height: 30px;
+            max-width: 200px;
+            filter: invert(1); /* Makes default player look decent on dark mode */
+        }
+        .msg-row.right audio { filter: invert(0); } /* Standard on green background */
+        
         .chat-disabled input { opacity: 0.5; pointer-events: none; }
         .chat-disabled button { opacity: 0.5; pointer-events: none; }
+
+        /* --- WALLET PREMIUM UI --- */
+        .wallet-card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .pay-note { 
+            background: rgba(255, 153, 0, 0.1); color: orange; font-size: 12px; 
+            padding: 10px; border-radius: 6px; margin-bottom: 15px; 
+            border-left: 2px solid orange; 
+        }
+        .pay-methods { display: flex; gap: 10px; margin-bottom: 15px; }
+        .pay-method-card { 
+            flex: 1; border: 1px solid #333; background: #0a0a0a; border-radius: 8px; 
+            padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; 
+        }
+        .pay-method-card.active { border-color: var(--primary); background: rgba(0, 255, 170, 0.05); }
+        .pay-method-card img { height: 30px; object-fit: contain; }
+        .pay-input-group { position: relative; margin-bottom: 15px; }
+        .pay-input-group label { display: block; font-size: 11px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; }
+
+        /* --- LIGHTBOX --- */
+        #ov-lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 6000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        #ov-lightbox.active { opacity: 1; pointer-events: all; }
+        #lb-img { max-width: 95%; max-height: 80%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .lb-controls {
+            position: absolute; top: 20px; right: 20px; display: flex; gap: 15px;
+        }
+        .lb-btn {
+            width: 40px; height: 40px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(5px); font-size: 18px; border: 1px solid rgba(255,255,255,0.2);
+        }
 
         /* --- MODALS --- */
         .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2500; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; }
@@ -387,7 +431,7 @@
         .cp-label { font-size: 12px; color: #aaa; margin-bottom: 8px; display: block; }
         .thumb-upload { width: 100%; height: 120px; border: 1px dashed var(--primary); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 255, 170, 0.05); color: var(--primary); cursor: pointer; margin-bottom: 20px; }
         .img-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 15px; }
-        .slot { aspect-ratio: 1; background: #111; border: 1px dashed #444; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .slot { aspect-ratio: 1; background: #111; border: 1px dashed #444; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; cursor: pointer; }
         .slot img, .thumb-upload img { width: 100%; height: 100%; object-fit: cover; }
         .bangla-note { font-size: 11px; color: #ff9900; background: rgba(255, 153, 0, 0.1); padding: 8px; border-radius: 4px; margin-bottom: 15px; border-left: 2px solid #ff9900; }
         
@@ -415,6 +459,15 @@
     <div id="loading-popup" class="hidden">
         <div class="popup-spinner" id="loading-spinner"></div>
         <div class="popup-text" id="loading-text">Processing...</div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div id="ov-lightbox">
+        <div class="lb-controls">
+            <div class="lb-btn" onclick="app.ui.downloadLightbox()"><i class="fas fa-download"></i></div>
+            <div class="lb-btn" onclick="app.ui.closeLightbox()"><i class="fas fa-times"></i></div>
+        </div>
+        <img id="lb-img" src="">
     </div>
 
     <!-- SPLASH -->
@@ -675,7 +728,7 @@
             <div class="chat-header">
                 <div>
                     <div class="chat-id" id="chat-deal-id">DEAL-0000</div>
-                    <div class="chat-timer" id="chat-timer-disp">00:00:00</div>
+                    <!-- Timer Removed as Requested -->
                 </div>
                 <div id="deal-action-icon" class="deal-actions-btn hidden" onclick="app.deals.ui.openMenu()">
                     <i class="fas fa-ellipsis-v"></i>
@@ -804,6 +857,9 @@
         window.appSettings = { deal_duration: 3 }; 
         window.selectedBoost = { days: 0, price: 0 };
         window.voiceTimer = null;
+        window.mediaRecorder = null;
+        window.audioChunks = [];
+        window.selectedWalletMethod = 'bkash';
 
         window.app = {
             isLoggingIn: false, 
@@ -991,11 +1047,11 @@
                     let seller = { name: "Loading...", photo: "https://via.placeholder.com/40", verified: false, sold_count: 0 };
                     try { const s = await get(ref(db, `users/${p.seller_uid}`)); if(s.exists()) seller = s.val(); } catch(e) {}
                     const thumb = p.thumbnail || p.images[0];
-                    const galleryHtml = p.images ? p.images.map(u=>`<img src="${u}" class="pv-slide">`).join('') : '';
+                    const galleryHtml = p.images ? p.images.map(u=>`<img src="${u}" class="pv-slide" onclick="app.ui.lightbox('${u}')">`).join('') : '';
                     const videoBtn = p.video_url ? `<a href="${p.video_url}" target="_blank" class="btn video-btn"><i class="fas fa-play"></i> Watch Video Proof</a>` : '';
                     const total = Math.round(p.price * 1.10); const fee = total - p.price;
                     document.getElementById('pv-content').innerHTML = `
-                        <img src="${thumb}" class="pv-hero">
+                        <img src="${thumb}" class="pv-hero" onclick="app.ui.lightbox('${thumb}')">
                         <div class="pv-title-sec"><span class="pv-tag">${p.category}</span><div class="pv-title">${p.title}</div><div class="price-card"><div><div class="price-row">Price: ${p.price}</div><div class="price-row">Fee: ${fee}</div></div><div class="price-final">${total} ৳</div></div></div>
                         <div style="padding:0 20px 20px;"><div class="seller-card"><div class="seller-left"><img src="${seller.photo}" class="seller-pic"><div class="seller-info"><h4>${seller.name}</h4>${seller.verified?'<div class="seller-badge"><i class="fas fa-check-circle"></i> Verified</div>':'<div style="font-size:10px;">New Seller</div>'}</div></div><div class="seller-sold-count"><span>${seller.sold_count||0}</span> Sold</div></div></div>
                         ${videoBtn}<div class="pv-gallery-label">Images</div><div class="pv-slider">${galleryHtml}</div><div class="pv-desc-box">${p.desc}</div><div style="height:80px;"></div>
@@ -1096,7 +1152,6 @@
                         app.ui.toast("Error");
                     }
                 },
-                // ... (Edit/Delete functions preserved from previous code) ...
                 openEdit: (id) => {
                     const p = window.rawPosts[id];
                     document.getElementById('ep-id').value = id;
@@ -1136,7 +1191,6 @@
                 },
                 load: () => onValue(ref(db, 'deals'), async s => {
                     const l=document.getElementById('deals-list'), d=s.val(); if(!d){l.innerHTML="No deals";return;}
-                    // Auto delete older than 3 days logic preserved
                     let list = Object.entries(d).filter(([k,v])=>v.buyer_uid==currentUser.uid||v.seller_uid==currentUser.uid);
                     list.sort((a, b) => { const score = status => status === 'payment_held' ? 3 : status === 'buyer_confirmed' ? 2 : 1; return score(b[1].status) - score(a[1].status); });
                     let html = "";
@@ -1161,7 +1215,13 @@
                              const isMe = m.uid === currentUser.uid, isAdmin = m.isAdmin;
                              let uData = { name: "Admin", photo: "https://cdn-icons-png.flaticon.com/512/2304/2304226.png" };
                              if(!isAdmin) uData = await window.app.utils.getUser(m.uid);
-                             b.innerHTML += `<div class="msg-row ${isMe?"right":"left"} ${isAdmin?"admin":""}"><img src="${isAdmin?'https://cdn-icons-png.flaticon.com/512/9320/9320875.png':uData.photo}" class="msg-pic"><div>${!isMe?`<div class="msg-name">${isAdmin?'ADMIN':uData.name}</div>`:''} <div class="msg-bubble">${m.text}</div></div></div>`;
+                             
+                             let msgContent = m.text;
+                             if(m.type === 'audio') {
+                                 msgContent = `<audio controls src="${m.url}"></audio>`;
+                             }
+
+                             b.innerHTML += `<div class="msg-row ${isMe?"right":"left"} ${isAdmin?"admin":""}"><img src="${isAdmin?'https://cdn-icons-png.flaticon.com/512/9320/9320875.png':uData.photo}" class="msg-pic"><div>${!isMe?`<div class="msg-name">${isAdmin?'ADMIN':uData.name}</div>`:''} <div class="msg-bubble">${msgContent}</div></div></div>`;
                         }
                         b.scrollTop = b.scrollHeight;
                     });
@@ -1206,33 +1266,114 @@
             },
             chat: { 
                 send: () => { const t=document.getElementById('chat-in').value; if(t) { push(ref(db, `deals/${window.app.activeDeal}/messages`), {text:t, uid:currentUser.uid, timestamp: serverTimestamp()}); document.getElementById('chat-in').value=''; document.getElementById('voice-btn').classList.remove('hidden'); document.getElementById('chat-send-btn').classList.add('hidden'); } },
-                // Voice Logic (UI Simulation for Single File)
-                startVoice: () => {
-                    document.getElementById('voice-overlay').style.display = 'flex';
-                    let sec = 0;
-                    document.getElementById('rec-time').innerText = "0:00";
-                    window.voiceTimer = setInterval(() => {
-                        sec++;
-                        let m = Math.floor(sec/60);
-                        let s = sec%60;
-                        document.getElementById('rec-time').innerText = `${m}:${s.toString().padStart(2,'0')}`;
-                    }, 1000);
+                // ACTUAL VOICE RECORDING
+                startVoice: async () => {
+                    if(!navigator.mediaDevices) return app.ui.toast("Permission denied");
+                    
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        window.mediaRecorder = new MediaRecorder(stream);
+                        window.audioChunks = [];
+                        
+                        window.mediaRecorder.ondataavailable = e => window.audioChunks.push(e.data);
+                        window.mediaRecorder.start();
+
+                        document.getElementById('voice-overlay').style.display = 'flex';
+                        let sec = 0;
+                        document.getElementById('rec-time').innerText = "0:00";
+                        window.voiceTimer = setInterval(() => {
+                            sec++;
+                            let m = Math.floor(sec/60);
+                            let s = sec%60;
+                            document.getElementById('rec-time').innerText = `${m}:${s.toString().padStart(2,'0')}`;
+                        }, 1000);
+                    } catch(e) {
+                        app.ui.toast("Mic Error: " + e.message);
+                    }
                 },
                 cancelVoice: () => {
                     clearInterval(window.voiceTimer);
+                    if(window.mediaRecorder) window.mediaRecorder.stop();
                     document.getElementById('voice-overlay').style.display = 'none';
+                    window.audioChunks = [];
                 },
                 sendVoice: () => {
                     clearInterval(window.voiceTimer);
                     document.getElementById('voice-overlay').style.display = 'none';
-                    // Since actual blob upload is complex in single file without backend config, sending a UI placeholder
-                    push(ref(db, `deals/${window.app.activeDeal}/messages`), {text: "🎤 Voice Message (0:05)", uid:currentUser.uid, timestamp: serverTimestamp()});
+                    
+                    if(window.mediaRecorder && window.mediaRecorder.state !== 'inactive') {
+                        window.mediaRecorder.stop();
+                        window.mediaRecorder.onstop = async () => {
+                            const blob = new Blob(window.audioChunks, { type: 'audio/webm' });
+                            app.ui.loading(true, "Sending Voice...");
+                            
+                            try {
+                                const audioRef = sRef(storage, `chat_audio/${window.app.activeDeal}/${Date.now()}.webm`);
+                                await uploadBytes(audioRef, blob);
+                                const url = await getDownloadURL(audioRef);
+                                
+                                await push(ref(db, `deals/${window.app.activeDeal}/messages`), {
+                                    type: 'audio',
+                                    url: url,
+                                    uid: currentUser.uid,
+                                    timestamp: serverTimestamp()
+                                });
+                                app.ui.loading(false);
+                            } catch(e) {
+                                app.ui.loading(false);
+                                app.ui.toast("Failed to send audio");
+                            }
+                        };
+                    }
                 }
             },
             wallet: {
-                open: (t) => { document.getElementById('w-body').innerHTML = t=='deposit' ? `<div style="background:#222; padding:10px; margin-bottom:10px;">Send to <b>01647712206</b></div><select id="wm"><option>bKash</option><option>Nagad</option></select><input type="number" id="wa" placeholder="Amount"><input type="text" id="wt" placeholder="Trx ID"><button class="btn" onclick="app.wallet.sub('deposit')">Submit</button>` : `<select id="wm"><option>bKash</option><option>Nagad</option></select><input type="number" id="wa" placeholder="Amount"><input type="text" id="wt" placeholder="Number"><button class="btn" onclick="app.wallet.sub('withdraw')">Withdraw</button>`; window.app.ui.open('ov-wallet'); },
+                open: (t) => { 
+                    window.selectedWalletMethod = 'bkash';
+                    let html = `<div class="wallet-card">`;
+                    
+                    if(t === 'deposit') {
+                        html += `
+                            <div class="pay-note">⚠️ DO NOT "Cash Out". Use <b>"Send Money"</b> only.</div>
+                            <div style="text-align:center; font-size:12px; color:#aaa; margin-bottom:5px;">Send To:</div>
+                            <h2 style="text-align:center; font-family:'Rajdhani'; color:var(--primary); margin-bottom:15px;">01647712206</h2>
+                        `;
+                    }
+                    
+                    html += `
+                        <div class="pay-methods">
+                            <div class="pay-method-card active" id="pm-bkash" onclick="app.wallet.selectMethod('bkash')">
+                                <img src="https://logos-download.com/wp-content/uploads/2022/01/BKash_Logo_icon.png">
+                                <div style="font-size:10px; margin-top:2px;">bKash</div>
+                            </div>
+                            <div class="pay-method-card" id="pm-nagad" onclick="app.wallet.selectMethod('nagad')">
+                                <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png">
+                                <div style="font-size:10px; margin-top:2px;">Nagad</div>
+                            </div>
+                        </div>
+                        <div class="pay-input-group">
+                            <label>Amount (BDT)</label>
+                            <input type="number" id="wa" placeholder="0.00">
+                        </div>
+                        <div class="pay-input-group">
+                            <label>${t==='deposit' ? 'Transaction ID' : 'Your Wallet Number'}</label>
+                            <input type="text" id="wt" placeholder="${t==='deposit' ? 'TrxID' : '01xxx...'}">
+                        </div>
+                        <button class="btn" onclick="app.wallet.sub('${t}')">${t === 'deposit' ? 'SUBMIT DEPOSIT' : 'REQUEST WITHDRAW'}</button>
+                    </div>`;
+
+                    document.getElementById('w-body').innerHTML = html; 
+                    window.app.ui.open('ov-wallet'); 
+                },
+                selectMethod: (m) => {
+                    window.selectedWalletMethod = m;
+                    document.getElementById('pm-bkash').classList.remove('active');
+                    document.getElementById('pm-nagad').classList.remove('active');
+                    document.getElementById(`pm-${m}`).classList.add('active');
+                },
                 sub: async (t) => { 
-                    const amt = Number(document.getElementById('wa').value), method = document.getElementById('wm').value, trx = document.getElementById('wt').value;
+                    const amt = Number(document.getElementById('wa').value), trx = document.getElementById('wt').value;
+                    const method = window.selectedWalletMethod;
                     if(!amt || !trx) return app.ui.toast("Fill all fields");
                     if(t === 'withdraw') { if(window.userData.wallet < amt) return app.ui.toast("Insufficient Balance"); await update(ref(db, `users/${currentUser.uid}`), { wallet: window.userData.wallet - amt }); }
                     await push(ref(db,'wallet_requests'), {uid:currentUser.uid, type:t, amount:amt, method:method, trx_id:trx, status:'pending'}); window.app.ui.close('ov-wallet'); window.app.ui.toast("Submitted"); 
@@ -1252,6 +1393,28 @@
                 loading: (show, text) => { 
                     const shadow = document.getElementById('screen-shadow'), popup = document.getElementById('loading-popup');
                     if(show){ document.getElementById('loading-text').innerText = text || "Processing..."; shadow.classList.remove('hidden'); popup.classList.remove('hidden'); } else { shadow.classList.add('hidden'); popup.classList.add('hidden'); }
+                },
+                lightbox: (src) => {
+                    document.getElementById('lb-img').src = src;
+                    document.getElementById('ov-lightbox').classList.add('active');
+                },
+                closeLightbox: () => document.getElementById('ov-lightbox').classList.remove('active'),
+                downloadLightbox: async () => {
+                     const src = document.getElementById('lb-img').src;
+                     try {
+                         const response = await fetch(src);
+                         const blob = await response.blob();
+                         const url = window.URL.createObjectURL(blob);
+                         const a = document.createElement('a');
+                         a.style.display = 'none';
+                         a.href = url;
+                         a.download = `ff-empire-img-${Date.now()}.jpg`;
+                         document.body.appendChild(a);
+                         a.click();
+                         window.URL.revokeObjectURL(url);
+                     } catch (e) {
+                         app.ui.toast("Download Failed");
+                     }
                 },
                 animateHeader: () => { const c1 = document.getElementById('ff-anim-container'), c2 = document.getElementById('ff-anim-container2'); c1.classList.add('animate'); c2.classList.add('animate'); setTimeout(() => { c1.classList.remove('animate'); c2.classList.remove('animate'); }, 10000); }
             }
