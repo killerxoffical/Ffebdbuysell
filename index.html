@@ -25,9 +25,7 @@
         * { 
             box-sizing: border-box; margin: 0; padding: 0; 
             -webkit-tap-highlight-color: transparent; outline: none; 
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10 and IE 11 */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none; user-select: none;
         }
         
         input, textarea {
@@ -361,11 +359,13 @@
         
         /* Audio Player Styling */
         audio {
-            height: 30px;
-            max-width: 200px;
-            filter: invert(1); /* Makes default player look decent on dark mode */
+            height: 35px;
+            max-width: 220px;
+            outline: none;
+            border-radius: 20px;
+            filter: invert(1); /* Makes player white on black */
         }
-        .msg-row.right audio { filter: invert(0); } /* Standard on green background */
+        .msg-row.right audio { filter: invert(0); } /* Normal for green bubble */
         
         .chat-disabled input { opacity: 0.5; pointer-events: none; }
         .chat-disabled button { opacity: 0.5; pointer-events: none; }
@@ -728,7 +728,7 @@
             <div class="chat-header">
                 <div>
                     <div class="chat-id" id="chat-deal-id">DEAL-0000</div>
-                    <!-- Timer Removed as Requested -->
+                    <!-- Timer Removed -->
                 </div>
                 <div id="deal-action-icon" class="deal-actions-btn hidden" onclick="app.deals.ui.openMenu()">
                     <i class="fas fa-ellipsis-v"></i>
@@ -1217,8 +1217,12 @@
                              if(!isAdmin) uData = await window.app.utils.getUser(m.uid);
                              
                              let msgContent = m.text;
+                             // AUDIO FIX
                              if(m.type === 'audio') {
-                                 msgContent = `<audio controls src="${m.url}"></audio>`;
+                                 msgContent = `<audio controls>
+                                    <source src="${m.url}" type="audio/webm">
+                                    <source src="${m.url}" type="audio/mp4">
+                                 </audio>`;
                              }
 
                              b.innerHTML += `<div class="msg-row ${isMe?"right":"left"} ${isAdmin?"admin":""}"><img src="${isAdmin?'https://cdn-icons-png.flaticon.com/512/9320/9320875.png':uData.photo}" class="msg-pic"><div>${!isMe?`<div class="msg-name">${isAdmin?'ADMIN':uData.name}</div>`:''} <div class="msg-bubble">${msgContent}</div></div></div>`;
@@ -1343,7 +1347,7 @@
                     html += `
                         <div class="pay-methods">
                             <div class="pay-method-card active" id="pm-bkash" onclick="app.wallet.selectMethod('bkash')">
-                                <img src="https://logos-download.com/wp-content/uploads/2022/01/BKash_Logo_icon.png">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIN-qbQEFv4aldtEFVa8uCUe8q9_eSya23l1FNCbAl2w&s=10">
                                 <div style="font-size:10px; margin-top:2px;">bKash</div>
                             </div>
                             <div class="pay-method-card" id="pm-nagad" onclick="app.wallet.selectMethod('nagad')">
@@ -1399,9 +1403,11 @@
                     document.getElementById('ov-lightbox').classList.add('active');
                 },
                 closeLightbox: () => document.getElementById('ov-lightbox').classList.remove('active'),
+                // FIXED DOWNLOAD FUNCTION
                 downloadLightbox: async () => {
                      const src = document.getElementById('lb-img').src;
                      try {
+                         // Try direct download
                          const response = await fetch(src);
                          const blob = await response.blob();
                          const url = window.URL.createObjectURL(blob);
@@ -1413,7 +1419,9 @@
                          a.click();
                          window.URL.revokeObjectURL(url);
                      } catch (e) {
-                         app.ui.toast("Download Failed");
+                         // Fallback for CORS issues: Open in new tab
+                         window.open(src, '_blank');
+                         app.ui.toast("Opening Image...");
                      }
                 },
                 animateHeader: () => { const c1 = document.getElementById('ff-anim-container'), c2 = document.getElementById('ff-anim-container2'); c1.classList.add('animate'); c2.classList.add('animate'); setTimeout(() => { c1.classList.remove('animate'); c2.classList.remove('animate'); }, 10000); }
