@@ -291,7 +291,6 @@
             display: flex; align-items: center; justify-content: space-between;
             width: 100%; padding-right: 15px;
         }
-        .chat-timer { font-family: 'Rajdhani'; font-weight: bold; color: var(--primary); font-size: 18px; display: none; } 
         .chat-id { font-size: 12px; color: #888; margin-top: -2px; }
         
         .deal-actions-btn {
@@ -301,7 +300,6 @@
             background: #222; color: #fff; cursor: pointer;
         }
         
-        /* Updated Horizontal Chat Input */
         #chat-input-area {
             position: absolute; bottom: 0; width: 100%;
             background: #000; padding: 10px 15px; border-top: 1px solid #222;
@@ -319,7 +317,6 @@
         }
         #chat-send-btn { background: var(--primary); color: #000; border-color: var(--primary); }
         
-        /* Premium Voice Recorder UI */
         .voice-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%; height: 65px;
             background: #111; display: flex; align-items: center; justify-content: space-between;
@@ -333,7 +330,6 @@
         .wave:nth-child(4) { animation-delay: 0.3s; height: 10px; }
         @keyframes wave { 0%, 100% { height: 5px; opacity: 0.5; } 50% { height: 25px; opacity: 1; } }
         
-        /* CHAT BUBBLES */
         .msg-bubble { 
             max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.4; position: relative; 
             white-space: pre-wrap;
@@ -357,36 +353,46 @@
         .msg-row.admin .msg-pic { border: 2px solid gold; }
         .msg-row.admin .msg-name { color: gold; font-weight: bold; }
         
-        /* --- PREMIUM VOICE PLAYER STYLES --- */
-        .voice-msg-container {
-            display: flex; align-items: center; gap: 10px;
-            min-width: 160px;
+        /* --- PREMIUM AUDIO PLAYER UI --- */
+        .audio-player {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 220px;
         }
-        .play-btn {
-            width: 30px; height: 30px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+        .ap-play-btn {
+            font-size: 18px;
             cursor: pointer;
-            font-size: 12px;
+            color: #fff;
         }
-        .msg-row.right .play-btn { background: #000; color: var(--primary); }
-        .msg-row.left .play-btn { background: #fff; color: #000; }
-        
-        .wave-visual {
-            display: flex; align-items: center; gap: 2px; height: 20px;
+        .msg-row.right .ap-play-btn { color: #000; }
+
+        .ap-progress-bar {
+            flex: 1;
+            height: 4px;
+            background-color: #555;
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
         }
-        .wave-bar {
-            width: 2px; background: rgba(0,0,0,0.3); border-radius: 2px;
-            height: 10px;
+        .msg-row.right .ap-progress-bar { background-color: rgba(0,0,0,0.3); }
+
+        .ap-progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary);
+            border-radius: 2px;
         }
-        .msg-row.left .wave-bar { background: rgba(255,255,255,0.4); }
-        /* Fake wave pattern */
-        .wave-bar:nth-child(2n) { height: 16px; }
-        .wave-bar:nth-child(3n) { height: 8px; }
-        .wave-bar:nth-child(4n) { height: 14px; }
-        
-        
-        .chat-disabled input { opacity: 0.5; pointer-events: none; }
-        .chat-disabled button { opacity: 0.5; pointer-events: none; }
+         .msg-row.right .ap-progress-fill { background-color: #000; }
+
+        .ap-time {
+            font-size: 11px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #aaa;
+        }
+        .msg-row.right .ap-time { color: #000; }
+
+        .chat-disabled input, .chat-disabled button { opacity: 0.5; pointer-events: none; }
 
         /* --- WALLET PREMIUM UI --- */
         .wallet-card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
@@ -470,7 +476,7 @@
         }
     </style>
 </head>
-<body oncontextmenu="return false"> <!-- DISABLE CONTEXT MENU -->
+<body oncontextmenu="return false">
 
     <!-- GLOBAL LOADER -->
     <div id="screen-shadow" class="hidden"></div>
@@ -937,13 +943,7 @@
                     if(s.exists()) { window.userCache[uid] = s.val(); return s.val(); }
                     return { name: "User", photo: "https://via.placeholder.com/30" };
                 },
-                fmtTime: (ms) => {
-                    if(ms < 0) return "EXPIRED";
-                    const h = Math.floor(ms / (1000*60*60));
-                    const m = Math.floor((ms % (1000*60*60)) / (1000*60));
-                    const s = Math.floor((ms % (1000*60)) / 1000);
-                    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                }
+                formatTime: (s) => { const min = Math.floor(s/60); const sec = Math.floor(s%60); return `${min}:${sec.toString().padStart(2,'0')}`; }
             },
             authUI: {
                 switch: (mode, el) => {
@@ -1002,23 +1002,11 @@
                     
                     posts = posts.filter(p => { const dp = Math.round(p.price * 1.10); return dp >= min && dp <= max; });
 
-                    // SEPARATE BOOSTED POSTS
-                    let boosted = [];
-                    let regular = [];
-                    const now = Date.now();
-
-                    posts.forEach(p => {
-                        if(p.is_boosted && p.boost_until > now) {
-                            boosted.push(p);
-                        } else {
-                            regular.push(p);
-                        }
-                    });
-
-                    // Randomize Boosted & Sort Regular by Date
+                    let boosted = [], regular = [], now = Date.now();
+                    posts.forEach(p => { (p.is_boosted && p.boost_until > now) ? boosted.push(p) : regular.push(p); });
+                    
                     boosted.sort(() => Math.random() - 0.5);
                     regular.sort((a,b) => b.timestamp - a.timestamp);
-
                     const allPosts = [...boosted, ...regular];
 
                     if(allPosts.length === 0) g.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#555; margin-top:50px;">No posts found.</p>';
@@ -1105,7 +1093,6 @@
                     };
                     render(window.rawPosts);
                 },
-                // BOOST LOGIC
                 openBoost: (pid) => {
                     window.boostPid = pid;
                     document.querySelectorAll('.b-opt').forEach(el=>el.classList.remove('selected'));
@@ -1131,13 +1118,10 @@
                 calcCustomBoost: () => {
                     const days = Number(document.getElementById('cb-days').value);
                     if(days < 1) { document.getElementById('cb-total').innerText = "0 ৳"; return; }
-                    
                     let total = days * 25;
-                    // Discount Logic
                     if(days > 1 && days <= 7) total -= 5;
                     else if(days >= 8 && days <= 20) total -= 10;
                     else if(days >= 21) total -= 20;
-
                     window.selectedBoost = { days, price: total };
                     document.getElementById('cb-total').innerText = `Total: ${total} ৳`;
                     document.getElementById('boost-confirm-btn').innerText = `PAY ${total}৳`;
@@ -1146,29 +1130,14 @@
                     const { days, price } = window.selectedBoost;
                     if(days < 1 || price < 1) return app.ui.toast("Select option");
                     if(window.userData.wallet < price) return app.ui.toast("Insufficient Balance");
-
                     app.ui.loading(true, "Boosting...");
                     try {
-                        const newBal = window.userData.wallet - price;
-                        await update(ref(db, `users/${currentUser.uid}`), { wallet: newBal });
-                        
-                        // Calculate Expiry
+                        await update(ref(db, `users/${currentUser.uid}`), { wallet: window.userData.wallet - price });
                         const boostMs = days * 24 * 60 * 60 * 1000;
-                        await update(ref(db, `posts/${window.boostPid}`), {
-                            is_boosted: true,
-                            boost_until: Date.now() + boostMs
-                        });
-
+                        await update(ref(db, `posts/${window.boostPid}`), { is_boosted: true, boost_until: Date.now() + boostMs });
                         app.ui.loading(true, "Success! ⚡");
-                        setTimeout(() => {
-                            app.ui.loading(false);
-                            app.deals.ui.closeAllPopups();
-                            app.post.myPosts(); // Refresh list
-                        }, 1000);
-                    } catch(e) {
-                        app.ui.loading(false);
-                        app.ui.toast("Error");
-                    }
+                        setTimeout(() => { app.ui.loading(false); app.deals.ui.closeAllPopups(); app.post.myPosts(); }, 1000);
+                    } catch(e) { app.ui.loading(false); app.ui.toast("Error"); }
                 },
                 openEdit: (id) => {
                     const p = window.rawPosts[id];
@@ -1229,32 +1198,34 @@
                     });
                     onValue(ref(db, `deals/${did}/messages`), async s => { 
                         const b=document.getElementById('chat-box'); b.innerHTML=''; const msgs = s.val(); if(!msgs) return;
-                        // Sort messages by timestamp if needed, but Firebase default order is usually key-based
-                        for(const [key, m] of Object.entries(msgs)) {
+                        
+                        let messagesData = [];
+                        if (msgs) {
+                            messagesData = Object.entries(msgs).map(([key, value]) => ({ key, ...value }));
+                        }
+
+                        for(const m of messagesData) {
                              const isMe = m.uid === currentUser.uid, isAdmin = m.isAdmin;
                              let uData = { name: "Admin", photo: "https://cdn-icons-png.flaticon.com/512/2304/2304226.png" };
                              if(!isAdmin) uData = await window.app.utils.getUser(m.uid);
                              
-                             let msgContent = m.text;
-                             // PREMIUM AUDIO PLAYER RENDER LOGIC
-                             if(m.type === 'audio') {
-                                 // Create a custom UI instead of <audio> tag
-                                 msgContent = `
-                                    <div class="voice-msg-container" onclick="app.chat.toggleAudio('audio-${key}')">
-                                        <div class="play-btn" id="icon-audio-${key}"><i class="fas fa-play"></i></div>
-                                        <div class="wave-visual">
-                                            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-                                            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-                                            <div class="wave-bar"></div><div class="wave-bar"></div>
-                                        </div>
-                                        <audio id="audio-${key}" src="${m.url}" onended="app.chat.resetIcon('audio-${key}')"></audio>
-                                    </div>
-                                 `;
+                             let msgContent;
+                             if (m.type === 'audio') {
+                                msgContent = `
+                                    <div class="audio-player" data-key="${m.key}">
+                                        <audio class="ap-audio" src="${m.url}" preload="metadata"></audio>
+                                        <i class="fas fa-play ap-play-btn"></i>
+                                        <div class="ap-progress-bar"><div class="ap-progress-fill"></div></div>
+                                        <span class="ap-time">0:00</span>
+                                    </div>`;
+                             } else {
+                                msgContent = m.text;
                              }
 
                              b.innerHTML += `<div class="msg-row ${isMe?"right":"left"} ${isAdmin?"admin":""}"><img src="${isAdmin?'https://cdn-icons-png.flaticon.com/512/9320/9320875.png':uData.photo}" class="msg-pic"><div>${!isMe?`<div class="msg-name">${isAdmin?'ADMIN':uData.name}</div>`:''} <div class="msg-bubble">${msgContent}</div></div></div>`;
                         }
                         b.scrollTop = b.scrollHeight;
+                        app.chat.initAudioPlayers();
                     });
                     // Toggle Mic/Send button logic
                     const chatIn = document.getElementById('chat-in');
@@ -1297,29 +1268,23 @@
             },
             chat: { 
                 send: () => { const t=document.getElementById('chat-in').value; if(t) { push(ref(db, `deals/${window.app.activeDeal}/messages`), {text:t, uid:currentUser.uid, timestamp: serverTimestamp()}); document.getElementById('chat-in').value=''; document.getElementById('voice-btn').classList.remove('hidden'); document.getElementById('chat-send-btn').classList.add('hidden'); } },
-                // ACTUAL VOICE RECORDING
                 startVoice: async () => {
                     if(!navigator.mediaDevices) return app.ui.toast("Permission denied");
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        window.mediaRecorder = new MediaRecorder(stream);
+                        window.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                         window.audioChunks = [];
                         window.mediaRecorder.ondataavailable = e => window.audioChunks.push(e.data);
                         window.mediaRecorder.start();
+
                         document.getElementById('voice-overlay').style.display = 'flex';
-                        let sec = 0;
-                        document.getElementById('rec-time').innerText = "0:00";
-                        window.voiceTimer = setInterval(() => {
-                            sec++;
-                            let m = Math.floor(sec/60);
-                            let s = sec%60;
-                            document.getElementById('rec-time').innerText = `${m}:${s.toString().padStart(2,'0')}`;
-                        }, 1000);
+                        let sec = 0; document.getElementById('rec-time').innerText = "0:00";
+                        window.voiceTimer = setInterval(() => { sec++; document.getElementById('rec-time').innerText = app.utils.formatTime(sec); }, 1000);
                     } catch(e) { app.ui.toast("Mic Error: " + e.message); }
                 },
                 cancelVoice: () => {
                     clearInterval(window.voiceTimer);
-                    if(window.mediaRecorder) window.mediaRecorder.stop();
+                    if(window.mediaRecorder && window.mediaRecorder.state !== 'inactive') window.mediaRecorder.stop();
                     document.getElementById('voice-overlay').style.display = 'none';
                     window.audioChunks = [];
                 },
@@ -1327,87 +1292,85 @@
                     clearInterval(window.voiceTimer);
                     document.getElementById('voice-overlay').style.display = 'none';
                     if(window.mediaRecorder && window.mediaRecorder.state !== 'inactive') {
-                        window.mediaRecorder.stop();
                         window.mediaRecorder.onstop = async () => {
                             const blob = new Blob(window.audioChunks, { type: 'audio/webm' });
+                            window.audioChunks = [];
                             app.ui.loading(true, "Sending Voice...");
                             try {
                                 const audioRef = sRef(storage, `chat_audio/${window.app.activeDeal}/${Date.now()}.webm`);
                                 await uploadBytes(audioRef, blob);
                                 const url = await getDownloadURL(audioRef);
-                                await push(ref(db, `deals/${window.app.activeDeal}/messages`), {
-                                    type: 'audio',
-                                    url: url,
-                                    uid: currentUser.uid,
-                                    timestamp: serverTimestamp()
-                                });
+                                await push(ref(db, `deals/${window.app.activeDeal}/messages`), { type: 'audio', url: url, uid: currentUser.uid, timestamp: serverTimestamp() });
                                 app.ui.loading(false);
                             } catch(e) { app.ui.loading(false); app.ui.toast("Failed to send audio"); }
                         };
+                        window.mediaRecorder.stop();
                     }
                 },
-                // AUDIO PLAYER CONTROLS
-                toggleAudio: (id) => {
-                    const audio = document.getElementById(id);
-                    const icon = document.getElementById('icon-' + id);
-                    
-                    // Stop all other audios
-                    document.querySelectorAll('audio').forEach(a => {
-                        if(a.id !== id) {
-                            a.pause();
-                            a.currentTime = 0;
-                            const otherIcon = document.getElementById('icon-' + a.id);
-                            if(otherIcon) otherIcon.innerHTML = '<i class="fas fa-play"></i>';
-                        }
-                    });
+                initAudioPlayers: () => {
+                    document.querySelectorAll('.audio-player').forEach(player => {
+                        const audio = player.querySelector('.ap-audio');
+                        const playBtn = player.querySelector('.ap-play-btn');
+                        const progressBar = player.querySelector('.ap-progress-bar');
+                        const progressFill = player.querySelector('.ap-progress-fill');
+                        const timeDisplay = player.querySelector('.ap-time');
 
-                    if (audio.paused) {
-                        audio.play();
-                        icon.innerHTML = '<i class="fas fa-pause"></i>';
-                    } else {
-                        audio.pause();
-                        icon.innerHTML = '<i class="fas fa-play"></i>';
-                    }
-                },
-                resetIcon: (id) => {
-                    const icon = document.getElementById('icon-' + id);
-                    if(icon) icon.innerHTML = '<i class="fas fa-play"></i>';
+                        playBtn.onclick = () => {
+                            if (audio.paused) audio.play();
+                            else audio.pause();
+                        };
+                        audio.onplay = () => playBtn.classList.replace('fa-play', 'fa-pause');
+                        audio.onpause = () => playBtn.classList.replace('fa-pause', 'fa-play');
+                        audio.onended = () => playBtn.classList.replace('fa-pause', 'fa-play');
+
+                        audio.onloadedmetadata = () => {
+                            timeDisplay.textContent = app.utils.formatTime(audio.duration);
+                        };
+
+                        audio.ontimeupdate = () => {
+                            const progress = (audio.currentTime / audio.duration) * 100;
+                            progressFill.style.width = `${progress}%`;
+                            timeDisplay.textContent = `${app.utils.formatTime(audio.currentTime)} / ${app.utils.formatTime(audio.duration)}`;
+                        };
+
+                        progressBar.onclick = (e) => {
+                            const rect = progressBar.getBoundingClientRect();
+                            const clickX = e.clientX - rect.left;
+                            const newTime = (clickX / rect.width) * audio.duration;
+                            audio.currentTime = newTime;
+                        };
+                    });
                 }
             },
             wallet: {
                 open: (t) => { 
                     window.selectedWalletMethod = 'bkash';
                     let html = `<div class="wallet-card">`;
-                    
                     if(t === 'deposit') {
-                        html += `
-                            <div class="pay-note">⚠️ DO NOT "Cash Out". Use <b>"Send Money"</b> only.</div>
-                            <div style="text-align:center; font-size:12px; color:#aaa; margin-bottom:5px;">Send To:</div>
-                            <h2 style="text-align:center; font-family:'Rajdhani'; color:var(--primary); margin-bottom:15px;">01647712206</h2>
-                        `;
+                        html += `<div class="pay-note">⚠️ DO NOT "Cash Out". Use <b>"Send Money"</b> only.</div>
+                                 <div style="text-align:center; font-size:12px; color:#aaa; margin-bottom:5px;">Send To:</div>
+                                 <h2 style="text-align:center; font-family:'Rajdhani'; color:var(--primary); margin-bottom:15px;">01647712206</h2>`;
                     }
-                    
-                    html += `
-                        <div class="pay-methods">
-                            <div class="pay-method-card active" id="pm-bkash" onclick="app.wallet.selectMethod('bkash')">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIN-qbQEFv4aldtEFVa8uCUe8q9_eSya23l1FNCbAl2w&s=10">
-                                <div style="font-size:10px; margin-top:2px;">bKash</div>
-                            </div>
-                            <div class="pay-method-card" id="pm-nagad" onclick="app.wallet.selectMethod('nagad')">
-                                <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png">
-                                <div style="font-size:10px; margin-top:2px;">Nagad</div>
-                            </div>
-                        </div>
-                        <div class="pay-input-group">
-                            <label>Amount (BDT)</label>
-                            <input type="number" id="wa" placeholder="0.00">
-                        </div>
-                        <div class="pay-input-group">
-                            <label>${t==='deposit' ? 'Transaction ID' : 'Your Wallet Number'}</label>
-                            <input type="text" id="wt" placeholder="${t==='deposit' ? 'TrxID' : '01xxx...'}">
-                        </div>
-                        <button class="btn" onclick="app.wallet.sub('${t}')">${t === 'deposit' ? 'SUBMIT DEPOSIT' : 'REQUEST WITHDRAW'}</button>
-                    </div>`;
+                    html += `   <div class="pay-methods">
+                                    <div class="pay-method-card active" id="pm-bkash" onclick="app.wallet.selectMethod('bkash')">
+                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIN-qbQEFv4aldtEFVa8uCUe8q9_eSya23l1FNCbAl2w&s=10">
+                                        <div style="font-size:10px; margin-top:2px;">bKash</div>
+                                    </div>
+                                    <div class="pay-method-card" id="pm-nagad" onclick="app.wallet.selectMethod('nagad')">
+                                        <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png">
+                                        <div style="font-size:10px; margin-top:2px;">Nagad</div>
+                                    </div>
+                                </div>
+                                <div class="pay-input-group">
+                                    <label>Amount (BDT)</label>
+                                    <input type="number" id="wa" placeholder="0.00">
+                                </div>
+                                <div class="pay-input-group">
+                                    <label>${t==='deposit' ? 'Transaction ID' : 'Your Wallet Number'}</label>
+                                    <input type="text" id="wt" placeholder="${t==='deposit' ? 'TrxID' : '01xxx...'}">
+                                </div>
+                                <button class="btn" onclick="app.wallet.sub('${t}')">${t === 'deposit' ? 'SUBMIT DEPOSIT' : 'REQUEST WITHDRAW'}</button>
+                            </div>`;
 
                     document.getElementById('w-body').innerHTML = html; 
                     window.app.ui.open('ov-wallet'); 
@@ -1446,25 +1409,18 @@
                     document.getElementById('ov-lightbox').classList.add('active');
                 },
                 closeLightbox: () => document.getElementById('ov-lightbox').classList.remove('active'),
-                // FIXED DOWNLOAD FUNCTION
                 downloadLightbox: async () => {
                      const src = document.getElementById('lb-img').src;
                      try {
-                         // Try direct download
                          const response = await fetch(src);
                          const blob = await response.blob();
                          const url = window.URL.createObjectURL(blob);
                          const a = document.createElement('a');
-                         a.style.display = 'none';
-                         a.href = url;
-                         a.download = `ff-empire-img-${Date.now()}.jpg`;
-                         document.body.appendChild(a);
-                         a.click();
-                         window.URL.revokeObjectURL(url);
+                         a.style.display = 'none'; a.href = url; a.download = `ff-empire-img-${Date.now()}.jpg`;
+                         document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url); a.remove();
                      } catch (e) {
-                         // Fallback for CORS issues: Open in new tab
                          window.open(src, '_blank');
-                         app.ui.toast("Opening Image...");
+                         app.ui.toast("Opening Image to Save Manually...");
                      }
                 },
                 animateHeader: () => { const c1 = document.getElementById('ff-anim-container'), c2 = document.getElementById('ff-anim-container2'); c1.classList.add('animate'); c2.classList.add('animate'); setTimeout(() => { c1.classList.remove('animate'); c2.classList.remove('animate'); }, 10000); }
