@@ -359,6 +359,7 @@
             align-items: center;
             gap: 10px;
             width: 220px;
+            padding: 5px 0;
         }
         .ap-play-btn {
             font-size: 18px;
@@ -382,6 +383,7 @@
             width: 0%;
             background-color: var(--primary);
             border-radius: 2px;
+            transition: width 0.1s linear; /* Smooth animation */
         }
          .msg-row.right .ap-progress-fill { background-color: #000; }
 
@@ -389,6 +391,8 @@
             font-size: 11px;
             font-family: 'Rajdhani', sans-serif;
             color: #aaa;
+            width: 65px; /* Fixed width to prevent layout shifts */
+            text-align: right;
         }
         .msg-row.right .ap-time { color: #000; }
 
@@ -752,7 +756,6 @@
             <div class="chat-header">
                 <div>
                     <div class="chat-id" id="chat-deal-id">DEAL-0000</div>
-                    <!-- Timer Removed -->
                 </div>
                 <div id="deal-action-icon" class="deal-actions-btn hidden" onclick="app.deals.ui.openMenu()">
                     <i class="fas fa-ellipsis-v"></i>
@@ -1199,10 +1202,7 @@
                     onValue(ref(db, `deals/${did}/messages`), async s => { 
                         const b=document.getElementById('chat-box'); b.innerHTML=''; const msgs = s.val(); if(!msgs) return;
                         
-                        let messagesData = [];
-                        if (msgs) {
-                            messagesData = Object.entries(msgs).map(([key, value]) => ({ key, ...value }));
-                        }
+                        let messagesData = Object.entries(msgs).map(([key, value]) => ({ key, ...value }));
 
                         for(const m of messagesData) {
                              const isMe = m.uid === currentUser.uid, isAdmin = m.isAdmin;
@@ -1295,6 +1295,7 @@
                         window.mediaRecorder.onstop = async () => {
                             const blob = new Blob(window.audioChunks, { type: 'audio/webm' });
                             window.audioChunks = [];
+                            if (blob.size < 100) return; // Ignore empty recordings
                             app.ui.loading(true, "Sending Voice...");
                             try {
                                 const audioRef = sRef(storage, `chat_audio/${window.app.activeDeal}/${Date.now()}.webm`);
@@ -1316,28 +1317,33 @@
                         const timeDisplay = player.querySelector('.ap-time');
 
                         playBtn.onclick = () => {
-                            if (audio.paused) audio.play();
-                            else audio.pause();
+                            if (audio.paused) {
+                                document.querySelectorAll('.ap-audio').forEach(aud => { if (aud !== audio) aud.pause(); }); // Pause other audios
+                                audio.play();
+                            } else audio.pause();
                         };
                         audio.onplay = () => playBtn.classList.replace('fa-play', 'fa-pause');
                         audio.onpause = () => playBtn.classList.replace('fa-pause', 'fa-play');
-                        audio.onended = () => playBtn.classList.replace('fa-pause', 'fa-play');
+                        audio.onended = () => { playBtn.classList.replace('fa-pause', 'fa-play'); progressFill.style.width = '0%'; };
 
                         audio.onloadedmetadata = () => {
-                            timeDisplay.textContent = app.utils.formatTime(audio.duration);
+                           if(isFinite(audio.duration)) timeDisplay.textContent = app.utils.formatTime(audio.duration);
                         };
 
                         audio.ontimeupdate = () => {
-                            const progress = (audio.currentTime / audio.duration) * 100;
-                            progressFill.style.width = `${progress}%`;
-                            timeDisplay.textContent = `${app.utils.formatTime(audio.currentTime)} / ${app.utils.formatTime(audio.duration)}`;
+                           if(isFinite(audio.duration)) {
+                               const progress = (audio.currentTime / audio.duration) * 100;
+                               progressFill.style.width = `${progress}%`;
+                               timeDisplay.textContent = `${app.utils.formatTime(audio.currentTime)} / ${app.utils.formatTime(audio.duration)}`;
+                           }
                         };
 
                         progressBar.onclick = (e) => {
-                            const rect = progressBar.getBoundingClientRect();
-                            const clickX = e.clientX - rect.left;
-                            const newTime = (clickX / rect.width) * audio.duration;
-                            audio.currentTime = newTime;
+                           if(isFinite(audio.duration)) {
+                                const rect = progressBar.getBoundingClientRect();
+                                const clickX = e.clientX - rect.left;
+                                audio.currentTime = (clickX / rect.width) * audio.duration;
+                           }
                         };
                     });
                 }
