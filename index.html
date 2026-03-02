@@ -543,11 +543,11 @@
             margin-bottom: 10px;
         }
 
-        /* --- FEED (VERTICAL) --- */
+        /* --- FEED (UPDATED TO VERTICAL) --- */
         .feed-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 20px;
             padding: 0 15px 20px;
         }
 
@@ -557,10 +557,10 @@
             overflow: hidden;
             border: 1px solid #2a2a2a;
             position: relative;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
             display: flex;
-            align-items: center;
-            height: 100px;
+            flex-direction: column; /* Vertical Layout */
+            height: auto;
         }
 
         .post-card.boosted {
@@ -569,37 +569,51 @@
         }
 
         .pc-img {
-            width: 120px;
-            height: 100%;
+            width: 100%;
+            height: 180px; /* Bigger Thumbnail */
             object-fit: cover;
             background: #222;
-            border-right: 1px solid #222;
+            border-bottom: 1px solid #222;
         }
 
         .pc-info {
-            padding: 10px 12px;
+            padding: 15px;
             position: relative;
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            height: 100%;
+        }
+
+        .pc-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .game-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #444;
         }
 
         .pc-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             color: #fff;
-            margin-bottom: 2px;
+            flex: 1;
         }
 
         .pc-login-method {
             font-size: 11px;
             color: #aaa;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -614,54 +628,46 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: auto;
+            margin-top: 5px;
+            border-top: 1px solid #222;
+            padding-top: 10px;
         }
 
         .pc-price-tag {
-            background: rgba(0, 255, 170, 0.1);
+            background: rgba(0, 255, 170, 0.05);
             border: 1px solid rgba(0, 255, 170, 0.3);
             color: var(--primary);
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-family: 'Rajdhani';
             font-weight: 700;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .pc-time {
-            font-size: 10px;
+            font-size: 11px;
             color: #666;
             font-style: italic;
         }
 
         .pc-badge {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            z-index: 5;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
-            color: #fff;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            font-weight: bold;
-            border: 1px solid #444;
+            display: none; /* Removed badge as we have icons now */
         }
 
         .boost-badge {
             position: absolute;
-            top: 0;
+            top: 10px;
             right: 0;
             background: var(--gold);
             color: #000;
-            font-size: 9px;
-            padding: 2px 8px;
-            border-bottom-left-radius: 8px;
+            font-size: 10px;
+            padding: 4px 10px;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
             text-transform: uppercase;
             font-weight: bold;
             z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         /* --- MY POSTS NEW LAYOUT --- */
@@ -1489,26 +1495,9 @@
             }
         }
 
-        @keyframes micPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.7);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 0, 85, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 85, 0);
-            }
-        }
-
         .recording {
-            animation: micPulse 1.5s infinite;
             color: var(--secondary) !important;
-            text-shadow: 0 0 10px var(--secondary);
-            background: rgba(255, 0, 85, 0.1) !important;
-            border-radius: 50%;
+            border-color: var(--secondary) !important;
         }
 
         .glass-panel,
@@ -1560,12 +1549,59 @@
             background: rgba(10, 10, 10, 0.95);
             backdrop-filter: blur(10px);
             padding: 10px 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid var(--primary); /* Glowing top border */
+            box-shadow: 0 -5px 15px rgba(0, 255, 170, 0.05);
             display: flex;
             gap: 8px;
             align-items: center;
             z-index: 50;
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Recording Mode Styles */
+        #chat-input-area.recording-mode #chat-in,
+        #chat-input-area.recording-mode .chat-plus-btn,
+        #chat-input-area.recording-mode .chat-tools-menu,
+        #chat-input-area.recording-mode #chat-send-btn {
+            display: none !important;
+        }
+
+        #recording-ui {
+            display: none;
+            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+        }
+
+        #chat-input-area.recording-mode #recording-ui {
+            display: flex;
+        }
+
+        .wave-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 40px;
+        }
+
+        .wave-bar {
+            width: 4px;
+            height: 10px;
+            background: var(--secondary);
+            border-radius: 2px;
+            animation: waveAnim 1s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes waveAnim {
+            0%, 100% { height: 10px; }
+            50% { height: 25px; }
         }
 
         #chat-in {
@@ -1685,48 +1721,38 @@
             word-wrap: break-word;
             word-break: break-word;
             overflow: hidden;
-            /* Ensure images don't overflow */
         }
 
-        .msg-bubble img,
-        .msg-bubble audio {
+        .msg-bubble img {
             max-width: 100% !important;
             border-radius: 8px;
             display: block;
         }
 
-        .msg-bubble audio {
+        /* HIDE DEFAULT AUDIO PLAYER MENU (3 DOTS) */
+        audio {
             height: 40px;
             outline: none;
         }
-
-        /* Hide download button on audio */
         audio::-webkit-media-controls-enclosure {
             background-color: transparent;
         }
-
         audio::-webkit-media-controls-panel {
             background-color: #f1f1f1;
             border-radius: 8px;
+            /* Mask overflow to hide dots */
+            padding-right: 10px; 
         }
-
-        /* Specific for some browsers to hide download */
-        audio::-webkit-media-controls-download-button {
-            display: none;
-        }
-
-        audio::-webkit-media-controls-volume-slider {
-            display: none;
-        }
-
-        audio::-webkit-media-controls-mute-button {
-            display: none;
+        /* Aggressively hide overflow menu */
+        audio::-webkit-media-controls-overflow-menu-button {
+            display: none !important;
+            -webkit-appearance: none;
         }
 
         .msg-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 6px; /* Reduced gap */
+            margin-bottom: 12px;
             align-items: flex-end;
         }
 
@@ -2961,7 +2987,23 @@
                     <i class="fas fa-microphone"></i>
                 </div>
             </div>
+            
             <input type="text" id="chat-in" placeholder="Message...">
+
+            <!-- Recording UI (Hidden by default) -->
+             <div id="recording-ui">
+                <div class="wave-container">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+                <button class="chat-btn" style="background:var(--secondary); border:none;" onclick="app.chat.sendVoiceRecord()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+             </div>
+
             <button class="chat-btn" id="chat-send-btn" onclick="app.chat.send()"><i
                     class="fas fa-paper-plane"></i></button>
         </div>
@@ -3237,6 +3279,14 @@
         window.selectedBoost = { days: 0, price: 0 };
         window.selectedWalletMethod = 'bkash';
 
+        const gameIcons = {
+            'Free Fire': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWlIGupGsVf4gCXiWJwQJvJ7bQ6ZERnsPcN0QGf9tpaqXc3E0BPubfQjeT&s=10',
+            'PUBG Mobile': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKgX_xFAJ-SQLehJLZ7sJ8Ans3d61AvDXERZ0XM1LxGQ&s',
+            'Clash of Clans': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAnOoJPcgoZo5WViZf48gxl_JXdM6429UQdni_ggFn1w&s=10',
+            'eFootball': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX-cnmxhYZtVtstiIhosvPHjXSli4kMcCSzB2EMh3Z2Q&s=10',
+            'Other': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiiMszXRibMAaQSAM5GP-JSkaug8atB6jquj22TJC0ZA&s=10'
+        };
+
         // Custom Dropdown Close Logic
         window.addEventListener('click', function (e) {
             document.querySelectorAll('.custom-select').forEach(el => {
@@ -3459,10 +3509,24 @@
                         });
                     }
                     if (search) {
-                        posts = posts.filter(p =>
-                            (p.title || '').toLowerCase().includes(search) ||
-                            (p.game && p.game.toLowerCase().includes(search))
-                        );
+                        const searchTerms = search.split(/\s+/).filter(w => w.length > 0);
+                        posts = posts.filter(p => {
+                            const titleLower = (p.title || '').toLowerCase();
+                            const gameLower = (p.game || '').toLowerCase();
+                            
+                            // Smart Search Logic: Check if any search word is substantially present
+                            // Or handle specific fuzzy cases like "coll of" -> "call of"
+                            
+                            // Basic includes check first
+                            if (titleLower.includes(search) || gameLower.includes(search)) return true;
+                            
+                            // Word match check
+                            const matchCount = searchTerms.filter(term => 
+                                titleLower.includes(term) || gameLower.includes(term)
+                            ).length;
+                            
+                            return matchCount >= 1; // Return true if at least one word matches
+                        });
                     }
 
                     let boosted = [], regular = [], now = Date.now();
@@ -3481,15 +3545,21 @@
                         const displayPrice = Math.round(Number(p.price || 0) * 1.10);
                         const isBoosted = p.is_boosted && p.boost_until > now;
                         const timeString = (window.app && window.app.utils && typeof window.app.utils.timeAgo === 'function') ? window.app.utils.timeAgo(p.timestamp) : '';
+                        
+                        // Icon Logic
+                        let iconUrl = gameIcons['Other'];
+                        if (p.game && gameIcons[p.game]) iconUrl = gameIcons[p.game];
 
                         g.innerHTML += `
                             <div class="post-card ${isBoosted ? 'boosted' : ''}" onclick="window.app.post.view('${p.id}')">
                                 ${isBoosted ? '<div class="boost-badge"><i class="fas fa-bolt"></i> SPONSORED</div>' : ''}
-                                <div class="pc-badge">${p.game || 'Game'}</div>
                                 <img src="${thumb}" class="pc-img">
                                 <div class="pc-info">
-                                    <div class="pc-title">${p.title}</div>
-                                    <div class="pc-login-method"><i class="fas fa-key"></i> ${p.category}</div>
+                                    <div class="pc-title-row">
+                                        <img src="${iconUrl}" class="game-icon">
+                                        <div class="pc-title">${p.title}</div>
+                                    </div>
+                                    <div class="pc-login-method"><i class="fas fa-key"></i> ${p.category} | ${p.game || 'Game'}</div>
                                     <div class="pc-row-bottom">
                                         <div class="pc-price-tag">৳ ${displayPrice}</div>
                                         <div class="pc-time">${timeString}</div>
@@ -4176,44 +4246,38 @@
                     menu.classList.toggle('active');
                 },
                 toggleVoice: async (btn) => {
-                    const chatIn = document.getElementById('chat-in');
-                    if (window.app.chat.isRecording) {
-                        try { window.app.chat.mediaRecorder.stop(); } catch (e) { }
+                    // Check permissions first
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        window.app.chat.mediaRecorder = new MediaRecorder(stream);
+                        window.app.chat.audioChunks = [];
+                        window.app.chat.mediaRecorder.ondataavailable = e => { window.app.chat.audioChunks.push(e.data); };
+                        
+                        // Switch UI to recording mode
+                        document.getElementById('chat-tools-menu').classList.remove('active');
+                        document.getElementById('chat-input-area').classList.add('recording-mode');
+                        window.app.chat.isRecording = true;
+                        
+                        window.app.chat.mediaRecorder.start();
+
+                    } catch (err) {
+                        window.app.ui.toast("Microphone access denied", "error");
                         window.app.chat.isRecording = false;
-                        btn.innerHTML = '<i class="fas fa-microphone"></i>';
-                        btn.classList.remove('recording');
-                        chatIn.placeholder = "Message...";
-                        document.getElementById('chat-tools-menu').classList.remove('active'); // Close menu
-                        if (window.app.chat.recordTimeout) clearTimeout(window.app.chat.recordTimeout);
-                    } else {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                            window.app.chat.mediaRecorder = new MediaRecorder(stream);
-                            window.app.chat.audioChunks = [];
-                            window.app.chat.mediaRecorder.ondataavailable = e => { window.app.chat.audioChunks.push(e.data); };
-                            window.app.chat.mediaRecorder.onstop = () => {
-                                if (window.app.chat.audioChunks.length > 0) {
-                                    const audioBlob = new Blob(window.app.chat.audioChunks, { type: 'audio/webm' });
-                                    window.app.chat.sendVoice(audioBlob);
-                                }
-                                stream.getTracks().forEach(t => t.stop());
-                            };
-                            window.app.chat.mediaRecorder.start();
-                            window.app.chat.isRecording = true;
-                            btn.innerHTML = '<i class="fas fa-stop"></i>';
-                            btn.classList.add('recording');
-                            chatIn.placeholder = "Recording Voice... (Tap mic to Send)";
-
-                            window.app.chat.recordTimeout = setTimeout(() => {
-                                if (window.app.chat.isRecording && window.app.chat.audioChunks.length === 0) {
-                                    // Keep recording status alive
-                                }
-                            }, 500);
-
-                        } catch (err) {
-                            window.app.ui.toast("Microphone access denied", "error");
-                        }
                     }
+                },
+                sendVoiceRecord: async () => {
+                   if(window.app.chat.mediaRecorder && window.app.chat.mediaRecorder.state !== 'inactive') {
+                        window.app.chat.mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(window.app.chat.audioChunks, { type: 'audio/webm' });
+                            window.app.chat.sendVoice(audioBlob);
+                            // Cleanup tracks
+                            window.app.chat.mediaRecorder.stream.getTracks().forEach(t => t.stop());
+                        };
+                        window.app.chat.mediaRecorder.stop();
+                   }
+                   // Revert UI
+                   document.getElementById('chat-input-area').classList.remove('recording-mode');
+                   window.app.chat.isRecording = false;
                 },
                 sendVoice: async (blob) => {
                     if (!window.app.activeDeal) return;
@@ -4354,12 +4418,17 @@
                     const lb = document.getElementById('ov-lightbox');
                     const img = document.getElementById('lb-img');
                     img.src = src;
-                    img.style.transform = 'scale(1)';
+                    img.style.transform = 'translate(0px, 0px) scale(1)';
                     lb.classList.add('active');
 
-                    // Pinch Zoom Logic
+                    // Advanced Pinch Zoom & Pan Logic
                     let initialDistance = 0;
                     let currentScale = 1;
+                    let lastScale = 1;
+                    let isDragging = false;
+                    let startX = 0, startY = 0;
+                    let translateX = 0, translateY = 0;
+                    let lastTranslateX = 0, lastTranslateY = 0;
 
                     const getDistance = (touches) => {
                         return Math.hypot(
@@ -4371,26 +4440,38 @@
                     lb.ontouchstart = (e) => {
                         if (e.touches.length === 2) {
                             initialDistance = getDistance(e.touches);
+                            isDragging = false;
+                        } else if (e.touches.length === 1 && currentScale > 1) {
+                            isDragging = true;
+                            startX = e.touches[0].clientX;
+                            startY = e.touches[0].clientY;
                         }
                     };
 
                     lb.ontouchmove = (e) => {
                         if (e.touches.length === 2) {
+                            e.preventDefault(); // Prevent page scroll
                             const distance = getDistance(e.touches);
                             const scaleDiff = distance / initialDistance;
-                            const newScale = Math.min(Math.max(1, currentScale * scaleDiff), 3); // Max 3x zoom
-                            img.style.transform = `scale(${newScale})`;
+                            const newScale = Math.min(Math.max(1, lastScale * scaleDiff), 3); 
+                            currentScale = newScale;
+                            img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${newScale})`;
+                        } else if (e.touches.length === 1 && isDragging) {
+                             e.preventDefault();
+                             const diffX = e.touches[0].clientX - startX;
+                             const diffY = e.touches[0].clientY - startY;
+                             translateX = lastTranslateX + diffX;
+                             translateY = lastTranslateY + diffY;
+                             img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
                         }
                     };
 
                     lb.ontouchend = (e) => {
                         if (e.touches.length < 2) {
-                            // Reset scale logic if needed or keep zoomed
-                            // For simplicity, reset on next pinch start, or keep simple
-                            // This simple logic resets internal scale ref based on visual
-                            const style = window.getComputedStyle(img);
-                            const matrix = new WebKitCSSMatrix(style.transform);
-                            currentScale = matrix.a; 
+                            lastScale = currentScale;
+                            lastTranslateX = translateX;
+                            lastTranslateY = translateY;
+                            isDragging = false;
                         }
                     };
                 },
